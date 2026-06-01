@@ -1,0 +1,8 @@
+@model IEnumerable<Product>
+@{ ViewData["Title"] = "Products"; }
+<h1>Product Master</h1>
+<p><a class="button" asp-action="Create">Add Product</a></p>
+<form method="get"><input name="search" placeholder="Search tag or product" /><button>Search</button></form>
+<table><thead><tr><th>Tag Number</th><th>Name</th><th>Category</th><th>Department</th><th>Status</th><th>Stage</th><th></th></tr></thead><tbody>
+@foreach (var item in Model) { <tr><td>@item.TagNumber</td><td>@item.ProductName</td><td>@item.Category</td><td>@item.Department?.Name</td><td>@item.Status</td><td>@item.CurrentStage</td><td><a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a></td></tr> }
+</tbody></table>

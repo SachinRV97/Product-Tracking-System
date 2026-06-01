@@ -1,0 +1,4 @@
+@model Department
+@{ ViewData["Title"] = Model.Id == 0 ? "Add Department" : "Edit Department"; }
+<h1>@ViewData["Title"]</h1>
+<form asp-action="Edit" method="post" class="form-grid"><input asp-for="Id" type="hidden" /><label>Name</label><input asp-for="Name" /><label>Code</label><input asp-for="Code" /><label>Active</label><input asp-for="IsActive" /><button>Save</button></form>

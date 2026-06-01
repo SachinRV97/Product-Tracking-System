@@ -1,0 +1,14 @@
+@model TrackingEntryViewModel
+@{ ViewData["Title"] = "Tracking Entry"; }
+<h1>Tracking Entry</h1>
+<form asp-action="Create" method="post" class="form-grid">
+    <div asp-validation-summary="ModelOnly" class="validation"></div>
+    <label>Tag Number</label><input asp-for="TagNumber" autofocus />
+    <label>To Department</label><select asp-for="ToDepartmentId" asp-items="ViewBag.Departments"><option value="">No department change</option></select>
+    <label>Location</label><input asp-for="Location" />
+    <label>Status</label><select asp-for="Status" asp-items="Html.GetEnumSelectList<ProductStatus>()"></select>
+    <label>Stage</label><select asp-for="Stage" asp-items="Html.GetEnumSelectList<LinenStage>()"></select>
+    <label>Handheld Reader ID</label><input asp-for="HandheldReaderId" />
+    <label>Remarks</label><textarea asp-for="Remarks"></textarea>
+    <button type="submit">Save Log</button>
+</form>

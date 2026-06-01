@@ -1,0 +1,4 @@
+@model AppRole
+@{ ViewData["Title"] = Model.Id == 0 ? "Create Role" : "Edit Role"; }
+<h1>@ViewData["Title"]</h1>
+<form asp-action="Edit" method="post" class="form-grid"><input asp-for="Id" type="hidden" /><label>Name</label><input asp-for="Name" /><label>Permissions</label><textarea asp-for="Permissions"></textarea><label>Active</label><input asp-for="IsActive" /><button>Save</button></form>

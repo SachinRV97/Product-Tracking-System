@@ -1,0 +1,16 @@
+@model ProductFormViewModel
+@{ ViewData["Title"] = "Edit Product"; }
+<h1>Edit Product</h1>
+<form asp-action="Edit" method="post" class="form-grid">
+    <input asp-for="Id" type="hidden" /><label>Tag Number</label><input asp-for="TagNumber" readonly />
+    <label>Product Name</label><input asp-for="ProductName" />
+    <label>Category</label><input asp-for="Category" />
+    <label>Department</label><select asp-for="DepartmentId" asp-items="ViewBag.Departments"></select>
+    <label>Purchase Date</label><input asp-for="PurchaseDate" type="date" />
+    <label>Vendor</label><input asp-for="Vendor" />
+    <label>Warranty Date</label><input asp-for="WarrantyDate" type="date" />
+    <label>Status</label><select asp-for="Status" asp-items="Html.GetEnumSelectList<ProductStatus>()"></select>
+    <label>Initial Linen Stage</label><select asp-for="CurrentStage" asp-items="Html.GetEnumSelectList<LinenStage>()"></select>
+    <label>Location</label><input asp-for="CurrentLocation" />
+    <button type="submit">Save Product</button>
+</form>
