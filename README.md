@@ -17,7 +17,11 @@ ASP.NET Core MVC + Microsoft SQL Server starter implementation for a company-wis
 
 ## Default setup
 
+<<<<<<< ours
 1. Update `ConnectionStrings:DefaultConnection` in `appsettings.json` for your SQL Server.
+=======
+1. The default connection string in `appsettings.json` targets your SQL Server instance `Server=(localdb)\MSSQLLocalDB` using SQL authentication (`User Id=sa;Password=123456`). If your LocalDB installation only allows Windows authentication, replace `User Id=sa;Password=123456` with `Trusted_Connection=True`.
+>>>>>>> theirs
 2. Run EF Core migrations or apply the SQL reference schema in `database/schema.sql`.
 3. Login with the seeded master account:
    - Company: `Your Company Name`
