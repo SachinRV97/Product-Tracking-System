@@ -1,12 +1,14 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductTrackingSystem.Data;
+using ProductTrackingSystem.Infrastructure.Constants;
 using ProductTrackingSystem.Services;
+using ProductTrackingSystem.Utilities;
 using ProductTrackingSystem.ViewModels;
+using System.Security.Claims;
 
 namespace ProductTrackingSystem.Controllers;
 
@@ -15,12 +17,14 @@ public class AccountController : Controller
     private readonly ApplicationDbContext _context;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IAuditService _audit;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(ApplicationDbContext context, IPasswordHasher passwordHasher, IAuditService audit)
+    public AccountController(ApplicationDbContext context, IPasswordHasher passwordHasher, IAuditService audit, ILogger<AccountController> logger)
     {
         _context = context;
         _passwordHasher = passwordHasher;
         _audit = audit;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -39,8 +43,10 @@ public class AccountController : Controller
 
         var user = await _context.Users.Include(x => x.Role).Include(x => x.Department)
             .FirstOrDefaultAsync(x => x.CompanyId == model.CompanyId && x.UserName == model.UserName && x.IsActive);
+        
         if (user == null || !_passwordHasher.Verify(model.Password, user.PasswordHash))
         {
+            _logger.LogWarning("Failed login attempt for user {UserName} in company {CompanyId}", model.UserName, model.CompanyId);
             ModelState.AddModelError(string.Empty, "Invalid company, user name, or password.");
             return View(model);
         }
@@ -49,14 +55,19 @@ public class AccountController : Controller
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.UserName),
-            new(ClaimTypes.Role, user.Role?.Name ?? "User"),
-            new("CompanyId", user.CompanyId.ToString()),
-            new("DepartmentId", user.DepartmentId?.ToString() ?? string.Empty),
-            new("EmployeeCode", user.EmployeeCode ?? string.Empty),
-            new("EmployeeName", user.EmployeeName)
+            new(ClaimTypes.Role, user.Role?.Name ?? AppConstants.Roles.User),
+            new(AppConstants.Claims.CompanyId, user.CompanyId.ToString()),
+            new(AppConstants.Claims.DepartmentId, user.DepartmentId?.ToString() ?? string.Empty),
+            new(AppConstants.Claims.EmployeeCode, user.EmployeeCode ?? string.Empty),
+            new(AppConstants.Claims.EmployeeName, user.EmployeeName)
         };
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
-        await _audit.WriteAsync(user.CompanyId, user.Id, user.UserName, "Login", "AppUser", user.Id.ToString(), "User logged in");
+        
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, 
+            new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
+        
+        await _audit.WriteAsync(user.CompanyId, user.Id, user.UserName, AppConstants.Audit.ActionLogin, "AppUser", user.Id.ToString(), "User logged in");
+        
+        _logger.LogInformation("User {UserName} logged in successfully", user.UserName);
         return RedirectToAction("Index", "Dashboard");
     }
 
@@ -69,23 +80,50 @@ public class AccountController : Controller
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-        var user = await _context.Users.FirstAsync(x => x.Id == userId);
+        
+        var userId = User.GetUserId();
+        if (userId <= 0)
+        {
+            _logger.LogWarning("Invalid user ID for password change");
+            return RedirectToAction(nameof(Logout));
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        if (user == null)
+        {
+            _logger.LogWarning("User {UserId} not found for password change", userId);
+            return RedirectToAction(nameof(Logout));
+        }
+
         if (!_passwordHasher.Verify(model.CurrentPassword, user.PasswordHash))
         {
+            _logger.LogWarning("Current password incorrect for user {UserName}", user.UserName);
             ModelState.AddModelError(nameof(model.CurrentPassword), "Current password is incorrect.");
             return View(model);
         }
+
         user.PasswordHash = _passwordHasher.Hash(model.NewPassword);
         await _context.SaveChangesAsync();
-        await _audit.WriteAsync(user.CompanyId, user.Id, user.UserName, "Change Password", "AppUser", user.Id.ToString(), "Password changed by user");
+        await _audit.WriteAsync(user.CompanyId, user.Id, user.UserName, AppConstants.Audit.ActionChangePassword, "AppUser", user.Id.ToString(), "Password changed by user");
+        
+        _logger.LogInformation("User {UserName} changed password successfully", user.UserName);
         ViewBag.Message = "Password changed successfully.";
         return View(new ChangePasswordViewModel());
     }
 
     public async Task<IActionResult> Logout()
     {
+        var userName = User.GetUserName();
+        var userId = User.GetUserId();
+        var companyId = User.GetCompanyId();
+        
         await HttpContext.SignOutAsync();
+        
+        if (userId > 0)
+        {
+            await _audit.WriteAsync(companyId, userId, userName, AppConstants.Audit.ActionLogout, "AppUser", userId.ToString(), "User logged out");
+        }
+        
         return RedirectToAction(nameof(Login));
     }
 

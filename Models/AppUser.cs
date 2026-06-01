@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using ProductTrackingSystem.Models.Base;
 
 namespace ProductTrackingSystem.Models;
 
-public class AppUser
+public class AppUser : BaseEntity
 {
-    public int Id { get; set; }
     public int CompanyId { get; set; }
     public Company? Company { get; set; }
     public int? DepartmentId { get; set; }

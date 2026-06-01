@@ -3,6 +3,9 @@ using ProductTrackingSystem.Models;
 
 namespace ProductTrackingSystem.Data;
 
+/// <summary>
+/// Application database context with soft-delete support and query filtering
+/// </summary>
 public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -19,6 +22,10 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Configure soft-delete query filters to exclude deleted records by default
+        ConfigureSoftDeleteQueryFilters(modelBuilder);
+
+        // Indexes
         modelBuilder.Entity<Company>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<Department>().HasIndex(x => new { x.CompanyId, x.Name }).IsUnique();
         modelBuilder.Entity<AppRole>().HasIndex(x => x.Name).IsUnique();
@@ -26,7 +33,14 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Product>().HasIndex(x => new { x.CompanyId, x.TagNumber }).IsUnique();
         modelBuilder.Entity<ProductTrackingLog>().HasIndex(x => x.UpdatedAtUtc);
         modelBuilder.Entity<AuditLog>().HasIndex(x => x.CreatedAtUtc);
+        
+        // Add indexes for soft-delete queries
+        modelBuilder.Entity<AppUser>().HasIndex(x => x.IsDeleted);
+        modelBuilder.Entity<Department>().HasIndex(x => x.IsDeleted);
+        modelBuilder.Entity<Product>().HasIndex(x => x.IsDeleted);
+        modelBuilder.Entity<ProductTrackingLog>().HasIndex(x => x.IsDeleted);
 
+        // Configure foreign keys
         modelBuilder.Entity<ProductTrackingLog>()
             .HasOne(x => x.FromDepartment)
             .WithMany()
@@ -43,6 +57,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(x => x.UpdatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Seed initial data
         modelBuilder.Entity<Company>().HasData(new Company { Id = 1, Name = "Your Company Name", LogoPath = "/images/company-logo.svg", IsActive = true });
         modelBuilder.Entity<AppRole>().HasData(
             new AppRole { Id = 1, Name = "Admin", Permissions = "*", IsActive = true },
@@ -72,5 +87,27 @@ public class ApplicationDbContext : DbContext
             IsActive = true,
             CreatedAtUtc = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
         });
+    }
+
+    /// <summary>
+    /// Configure query filters to automatically exclude soft-deleted records
+    /// </summary>
+    private void ConfigureSoftDeleteQueryFilters(ModelBuilder modelBuilder)
+    {
+        // Filter AppUser - exclude deleted
+        modelBuilder.Entity<AppUser>()
+            .HasQueryFilter(u => !u.IsDeleted);
+
+        // Filter Department - exclude deleted
+        modelBuilder.Entity<Department>()
+            .HasQueryFilter(d => !d.IsDeleted);
+
+        // Filter Product - exclude deleted
+        modelBuilder.Entity<Product>()
+            .HasQueryFilter(p => !p.IsDeleted);
+
+        // Filter ProductTrackingLog - exclude deleted
+        modelBuilder.Entity<ProductTrackingLog>()
+            .HasQueryFilter(ptl => !ptl.IsDeleted);
     }
 }
