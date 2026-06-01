@@ -4,6 +4,7 @@ using ProductTrackingSystem.Data;
 using ProductTrackingSystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var seedDemoData = args.Contains("--seed-demo-data", StringComparer.OrdinalIgnoreCase);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -27,8 +28,20 @@ builder.Services.AddSession(options =>
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITagNumberService, TagNumberService>();
+builder.Services.AddScoped<ApplicationDbSeeder>();
 
 var app = builder.Build();
+
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<ApplicationDbSeeder>();
+    await seeder.InitializeAsync(seedDemoData);
+}
+
+if (seedDemoData)
+{
+    return;
+}
 
 if (!app.Environment.IsDevelopment())
 {

@@ -17,17 +17,19 @@ ASP.NET Core MVC + Microsoft SQL Server starter implementation for a company-wis
 
 ## Default setup
 
-<<<<<<< ours
-1. Update `ConnectionStrings:DefaultConnection` in `appsettings.json` for your SQL Server.
-=======
-1. The default connection string in `appsettings.json` targets your SQL Server instance `Server=(localdb)\MSSQLLocalDB` using SQL authentication (`User Id=sa;Password=123456`). If your LocalDB installation only allows Windows authentication, replace `User Id=sa;Password=123456` with `Trusted_Connection=True`.
->>>>>>> theirs
+1. The default connection string in `appsettings.json` targets `Server=(localdb)\MSSQLLocalDB` with Windows authentication:
+   `Server=(localdb)\MSSQLLocalDB;Database=ProductTrackingSystem;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False`
+   If you are using a regular SQL Server instance instead of LocalDB, replace it with your SQL login details, for example:
+   `Server=localhost;Database=ProductTrackingSystem;User Id=sa;Password=123456;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False`
 2. Run EF Core migrations or apply the SQL reference schema in `database/schema.sql`.
 3. Login with the seeded master account:
    - Company: `Your Company Name`
    - User name: `admin`
    - Password: `Admin@123`
 4. Replace `Company:Name` and `Company:LogoPath` in `appsettings.json` and upload your company logo under `wwwroot/images`.
+5. To add demo users, products, and tracking logs for testing, run:
+   `dotnet run -- --seed-demo-data`
+   Demo users are created with password `Demo@123`, including `ops.manager`, `store.user`, `track.user`, `viewer.user`, and `finance.manager`.
 
 ## Data retention
 
