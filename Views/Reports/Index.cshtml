@@ -1,0 +1,10 @@
+@{ ViewData["Title"] = "Reports"; }
+<h1>Reports</h1>
+<form method="get" class="report-filter"><input type="date" name="from" /><input type="date" name="to" /><button>Apply</button><button type="button" onclick="window.print()">Print</button></form>
+<section><h2>Product Report</h2><table><thead><tr><th>Tag</th><th>Name</th><th>Department</th><th>Status</th><th>Stage</th></tr></thead><tbody>
+@foreach (Product p in ViewBag.Products) { <tr><td>@p.TagNumber</td><td>@p.ProductName</td><td>@p.Department?.Name</td><td>@p.Status</td><td>@p.CurrentStage</td></tr> }
+</tbody></table></section>
+<section><h2>Tracking Report</h2><table><thead><tr><th>Date/Time (UTC)</th><th>Tag</th><th>To Department</th><th>Stage</th><th>Status</th><th>User</th></tr></thead><tbody>
+@foreach (ProductTrackingLog t in ViewBag.Tracking) { <tr><td>@t.UpdatedAtUtc</td><td>@t.Product?.TagNumber</td><td>@t.ToDepartment?.Name</td><td>@t.Stage</td><td>@t.Status</td><td>@t.UpdatedByUser?.UserName</td></tr> }
+</tbody></table></section>
+<section><h2>Department Wise Report</h2><ul>@foreach (var d in ViewBag.DepartmentSummary) { <li>@d.Department: @d.TotalProducts</li> }</ul></section>

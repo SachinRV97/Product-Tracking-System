@@ -1,0 +1,6 @@
+@model IEnumerable<Department>
+@{ ViewData["Title"] = "Departments"; }
+<h1>Department Master</h1><p><a class="button" asp-action="Create">Add Department</a></p>
+<table><thead><tr><th>Name</th><th>Code</th><th>Status</th><th></th></tr></thead><tbody>
+@foreach (var item in Model) { <tr><td>@item.Name</td><td>@item.Code</td><td>@(item.IsActive ? "Active" : "Inactive")</td><td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a></td></tr> }
+</tbody></table>

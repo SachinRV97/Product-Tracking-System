@@ -1,0 +1,16 @@
+@{ ViewData["Title"] = "Dashboard"; }
+<h1>Dashboard</h1>
+<div class="cards">
+    <div><strong>@ViewBag.TotalProducts</strong><span>Total Products</span></div>
+    <div><strong>@ViewBag.ActiveProducts</strong><span>Active Products</span></div>
+    <div><strong>@ViewBag.TransferredProducts</strong><span>Transferred</span></div>
+    <div><strong>@ViewBag.DisposedProducts</strong><span>Disposed</span></div>
+    <div><strong>@ViewBag.TotalUsers</strong><span>Total Users</span></div>
+    <div><strong>@ViewBag.ActiveUsers</strong><span>Active Users</span></div>
+    <div><strong>@ViewBag.DepartmentCount</strong><span>Departments</span></div>
+    <div><strong>@ViewBag.TodayTracking</strong><span>Today's Logs</span></div>
+</div>
+<div class="grid-two">
+    <section><h2>Department-wise Products</h2><ul>@foreach (var row in ViewBag.ByDepartment) { <li>@row.Name: @row.Count</li> }</ul></section>
+    <section><h2>Status Distribution</h2><ul>@foreach (var row in ViewBag.ByStatus) { <li>@row.Name: @row.Count</li> }</ul></section>
+</div>

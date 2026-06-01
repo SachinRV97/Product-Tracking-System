@@ -1,0 +1,17 @@
+@model AppUser
+@{ ViewData["Title"] = Model.Id == 0 ? "Create User" : "Edit User"; }
+<h1>@ViewData["Title"]</h1>
+<form asp-action="Edit" method="post" class="form-grid">
+    <input asp-for="Id" type="hidden" /><input asp-for="PasswordHash" type="hidden" />
+    <label>User Name</label><input asp-for="UserName" />
+    <label>Employee Code</label><input asp-for="EmployeeCode" />
+    <label>Employee Name</label><input asp-for="EmployeeName" />
+    <label>Department</label><select asp-for="DepartmentId" asp-items="ViewBag.Departments"><option value="">None</option></select>
+    <label>Role</label><select asp-for="RoleId" asp-items="ViewBag.Roles"></select>
+    <label>Email</label><input asp-for="Email" />
+    <label>Mobile</label><input asp-for="Mobile" />
+    <label>New / Reset Password</label><input name="newPassword" type="password" />
+    <label>Master Login</label><input asp-for="IsMasterLogin" />
+    <label>Active</label><input asp-for="IsActive" />
+    <button>Save</button>
+</form>

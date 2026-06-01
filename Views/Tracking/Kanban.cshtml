@@ -1,0 +1,21 @@
+@model IEnumerable<IGrouping<LinenStage, Product>>
+@{ ViewData["Title"] = "Linen Kanban"; }
+<h1>Digital Linen Log Book</h1>
+<p>Scan or enter tag logs from handheld readers and move linen through each stage.</p>
+<div class="kanban">
+@foreach (var group in Model)
+{
+    <section class="kanban-column">
+        <h2>@group.Key</h2>
+        @foreach (var product in group)
+        {
+            <article class="kanban-card">
+                <strong>@product.TagNumber</strong>
+                <span>@product.ProductName</span>
+                <small>@product.Department?.Name | @product.Status | @product.CurrentLocation</small>
+                <a asp-action="Create" asp-route-tagNumber="@product.TagNumber">Log next stage</a>
+            </article>
+        }
+    </section>
+}
+</div>

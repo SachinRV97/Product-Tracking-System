@@ -1,0 +1,21 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+<section class="login-card">
+    <h1>Company Login</h1>
+    <p>Use the master login or one of the authorized company users.</p>
+    <form asp-action="Login" method="post">
+        <div asp-validation-summary="ModelOnly" class="validation"></div>
+        <label>Company</label>
+        <select asp-for="CompanyId" asp-items="@(new SelectList(ViewBag.Companies, "Id", "Name"))"></select>
+        <label>User Name</label>
+        <input asp-for="UserName" autocomplete="username" />
+        <span asp-validation-for="UserName"></span>
+        <label>Password</label>
+        <input asp-for="Password" autocomplete="current-password" />
+        <span asp-validation-for="Password"></span>
+        <button type="submit">Login</button>
+    </form>
+</section>

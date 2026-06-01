@@ -1,0 +1,39 @@
+@inject IConfiguration Configuration
+@{
+    var companyName = Configuration["Company:Name"] ?? "Product Tracking System";
+    var logoPath = Configuration["Company:LogoPath"] ?? "/images/company-logo.svg";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - @companyName</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand"><img src="@logoPath" alt="@companyName logo" /><span>@companyName</span></div>
+        <nav>
+            <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+            <a asp-controller="Tracking" asp-action="Kanban">Kanban</a>
+            <a asp-controller="Tracking" asp-action="Create">Tracking Entry</a>
+            <a asp-controller="Products" asp-action="Index">Products</a>
+            <a asp-controller="Departments" asp-action="Index">Departments</a>
+            <a asp-controller="Users" asp-action="Index">Users</a>
+            <a asp-controller="Roles" asp-action="Index">Roles</a>
+            <a asp-controller="Reports" asp-action="Index">Reports</a>
+        </nav>
+        <div class="session">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span>@User.Identity.Name</span>
+                <a asp-controller="Account" asp-action="ChangePassword">Change Password</a>
+                <a asp-controller="Account" asp-action="Logout">Logout</a>
+            }
+        </div>
+    </header>
+    <main class="container">@RenderBody()</main>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

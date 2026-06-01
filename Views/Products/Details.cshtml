@@ -1,0 +1,5 @@
+@model Product
+@{ ViewData["Title"] = "Product Details"; }
+<h1>@Model.TagNumber</h1>
+<dl><dt>Name</dt><dd>@Model.ProductName</dd><dt>Department</dt><dd>@Model.Department?.Name</dd><dt>Status</dt><dd>@Model.Status</dd><dt>Stage</dt><dd>@Model.CurrentStage</dd><dt>Location</dt><dd>@Model.CurrentLocation</dd></dl>
+<p><a asp-controller="Tracking" asp-action="History" asp-route-tagNumber="@Model.TagNumber">View movement history</a></p>

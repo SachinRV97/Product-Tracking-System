@@ -1,0 +1,6 @@
+@model IEnumerable<AppRole>
+@{ ViewData["Title"] = "Roles"; }
+<h1>Role Management</h1><p><a class="button" asp-action="Create">Create Role</a></p>
+<table><thead><tr><th>Name</th><th>Permissions</th><th>Status</th><th></th></tr></thead><tbody>
+@foreach (var item in Model) { <tr><td>@item.Name</td><td>@item.Permissions</td><td>@(item.IsActive ? "Active" : "Inactive")</td><td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a></td></tr> }
+</tbody></table>

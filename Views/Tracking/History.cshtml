@@ -1,0 +1,6 @@
+@model IEnumerable<ProductTrackingLog>
+@{ ViewData["Title"] = "Tracking History"; }
+<h1>Tracking History</h1>
+<table><thead><tr><th>Date/Time (UTC)</th><th>Tag</th><th>From</th><th>To</th><th>Stage</th><th>Status</th><th>User</th><th>Reader</th></tr></thead><tbody>
+@foreach (var log in Model) { <tr><td>@log.UpdatedAtUtc</td><td>@log.Product?.TagNumber</td><td>@log.FromDepartment?.Name</td><td>@log.ToDepartment?.Name</td><td>@log.Stage</td><td>@log.Status</td><td>@log.UpdatedByUser?.UserName</td><td>@log.HandheldReaderId</td></tr> }
+</tbody></table>
