@@ -41,21 +41,45 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<ProductTrackingLog>().HasIndex(x => x.IsDeleted);
 
         // Configure foreign keys
+        modelBuilder.Entity<Product>()
+            .HasOne(x => x.Company)
+            .WithMany()
+            .HasForeignKey(x => x.CompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
+        
+        modelBuilder.Entity<Product>()
+            .HasOne(x => x.Department)
+            .WithMany()
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProductTrackingLog>()
+            .HasOne(x => x.Product)
+            .WithMany(x => x.TrackingLogs)
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProductTrackingLog>()
+            .HasOne(x => x.Company)
+            .WithMany()
+            .HasForeignKey(x => x.CompanyId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<ProductTrackingLog>()
             .HasOne(x => x.FromDepartment)
             .WithMany()
             .HasForeignKey(x => x.FromDepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
         modelBuilder.Entity<ProductTrackingLog>()
             .HasOne(x => x.ToDepartment)
             .WithMany()
             .HasForeignKey(x => x.ToDepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
         modelBuilder.Entity<ProductTrackingLog>()
             .HasOne(x => x.UpdatedByUser)
             .WithMany()
             .HasForeignKey(x => x.UpdatedByUserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // Seed initial data
         modelBuilder.Entity<Company>().HasData(new Company { Id = 1, Name = "Your Company Name", LogoPath = "/images/company-logo.svg", IsActive = true });
