@@ -1,4 +1,4 @@
 database/ProductTrackingSystem_log.ldf
 database/ProductTrackingSystem.mdf
-bin/
-obj/
+bin/*
+obj/*
